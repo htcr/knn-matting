@@ -2,6 +2,7 @@ import numpy as np
 import sklearn.neighbors
 import scipy.sparse
 import warnings
+import cv2
 
 nn = 10
 
@@ -47,8 +48,14 @@ def knn_matte(img, trimap, mylambda=100):
 def main():
     img = scipy.misc.imread('donkey.png')[:,:,:3]
     trimap = scipy.misc.imread('donkeyTrimap.png')[:,:,:3]
+    print(img)
+    print(img.shape)
+    print(np.mean(img))
+    print(np.mean(trimap))
+    
     alpha = knn_matte(img, trimap)
-    scipy.misc.imsave('donkeyAlpha.png', alpha)
+    cv2.imwrite('donkeyAlpha.png', alpha)
+    # scipy.misc.imsave('donkeyAlpha.png', alpha)
     plt.title('Alpha Matte')
     plt.imshow(alpha, cmap='gray')
     plt.show()
