@@ -29,26 +29,38 @@ def knn_matte(img, trimap, mylambda=100):
 
     D_script = scipy.sparse.diags(np.ravel(A.sum(axis=1)))
     L = D_script-A
-    D = scipy.sparse.diags(np.ravel(all_constraints[:,:, 0]))
-    v = np.ravel(foreground[:,:,0])
+    
+    print(all_constraints.shape)
+
+    D = scipy.sparse.diags(np.ravel(all_constraints[:,:]))
+    
+    print(foreground.shape)
+
+    v = np.ravel(foreground[:,:])
     c = 2*mylambda*np.transpose(v)
     H = 2*(L + mylambda*D)
 
     print('Solving linear system for alpha')
     warnings.filterwarnings('error')
     alpha = []
+    
+    x = scipy.sparse.linalg.lsqr(H, c)
+    alpha = np.minimum(np.maximum(x[0], 0), 1).reshape(m, n)
+
+    """
     try:
         alpha = np.minimum(np.maximum(scipy.sparse.linalg.spsolve(H, c), 0), 1).reshape(m, n)
     except Warning:
         x = scipy.sparse.linalg.lsqr(H, c)
         alpha = np.minimum(np.maximum(x[0], 0), 1).reshape(m, n)
+    """
+
     return alpha
 
 
 def main():
     img = scipy.misc.imread('image.png')[:,:,:3]
     trimap = scipy.misc.imread('trimap.png')[:,:]
-    print(img)
     print(img.shape)
     print(np.mean(img))
     print(np.mean(trimap))
